@@ -34,7 +34,7 @@ var OverheatLock = func() {
 var OverheatUnlock = func() {
 	for {
 		if swapped := atomic.CompareAndSwapUint32(&dataSignerOverheat, 1, 0); !swapped {
-			fmt.Println("OverheatUnlock happend")
+			fmt.Println("OverheatUnlock happened")
 			time.Sleep(time.Second)
 		} else {
 			break
@@ -42,6 +42,7 @@ var OverheatUnlock = func() {
 	}
 }
 
+// DataSignerMd5 is used to compute md5
 var DataSignerMd5 = func(data string) string {
 	OverheatLock()
 	defer OverheatUnlock()
@@ -51,6 +52,7 @@ var DataSignerMd5 = func(data string) string {
 	return dataHash
 }
 
+// DataSignerCrc32 is used to compute crc32
 var DataSignerCrc32 = func(data string) string {
 	data += DataSignerSalt
 	crcH := crc32.ChecksumIEEE([]byte(data))

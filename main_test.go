@@ -11,10 +11,9 @@ import (
 )
 
 /*
-это тест на проверку того что у нас это действительно конвейер
-неправильное поведение: накапливать результаты выполнения одной функции, а потом слать их в следующую.
-	это не похволяет запускать на конвейере бесконечные задачи
-правильное поведение: обеспечить беспрепятственный поток
+	This is a test to verify that we really have a pipeline. Incorrect behavior: accumulate the results of the
+	execution of one function, and then send them to the next. This does not allow infinite tasks to run on the
+	pipeline, the correct behavior is to ensure a smooth flow.
 */
 func TestPipeline(t *testing.T) {
 
@@ -25,10 +24,6 @@ func TestPipeline(t *testing.T) {
 			out <- 1
 			time.Sleep(10 * time.Millisecond)
 			currRecieved := atomic.LoadUint32(&recieved)
-			// в чем тут суть
-			// если вы накапливаете значения, то пока вся функция не отрабоатет - дальше они не пойдут
-			// тут я проверяю, что счетчик увеличился в следующей функции
-			// это значит что туда дошло значение прежде чем текущая функция отработала
 			if currRecieved == 0 {
 				ok = false
 			}
@@ -50,11 +45,9 @@ func TestSigner(t *testing.T) {
 	testExpected := "1173136728138862632818075107442090076184424490584241521304_1696913515191343735512658979631549563179965036907783101867_27225454331033649287118297354036464389062965355426795162684_29568666068035183841425683795340791879727309630931025356555_3994492081516972096677631278379039212655368881548151736_4958044192186797981418233587017209679042592862002427381542_4958044192186797981418233587017209679042592862002427381542"
 	testResult := "NOT_SET"
 
-	// это небольшая защита от попыток не вызывать мои функции расчета
-	// я преопределяю фукции на свои которые инкрементят локальный счетчик
-	// переопределение возможо потому что я объявил функцию как переменную, в которой лежит функция
+	// check that correct functions are called
 	var (
-		DataSignerSalt         string = "" // на сервере будет другое значение
+		DataSignerSalt         string = ""
 		OverheatLockCounter    uint32
 		OverheatUnlockCounter  uint32
 		DataSignerMd5Counter   uint32
@@ -138,7 +131,7 @@ func TestSigner(t *testing.T) {
 		t.Errorf("execition too long\nGot: %s\nExpected: <%s", end, time.Second*3)
 	}
 
-	// 8 потому что 2 в SingleHash и 6 в MultiHash
+	// 8 because 2 in SingleHash and 6 in MultiHash
 	if int(OverheatLockCounter) != len(inputData) ||
 		int(OverheatUnlockCounter) != len(inputData) ||
 		int(DataSignerMd5Counter) != len(inputData) ||
